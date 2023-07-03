@@ -5,9 +5,39 @@ body {
 }
 
 header {
-    background-color: #333;
-    color: #fff;
-    padding: 20px;
+    background-color: #333333;
+    color: #FFFFFF;
+    padding: 32px;
+    font-size: 64px;
+}
+
+section {
+    padding: 40px;
+}
+
+#about {
+    background-color: #FFC0CB;
+}
+
+#image-section {
+    background-color: #FF3366;
+}
+
+#portfolio {
+    background-color: #ADD8E6;
+}
+
+#contact {
+    background-color: #4488FF;
+}
+
+#image-section .image-container p {
+    color: #FFFFFF;
+}
+
+#image-section .image-container img {
+    width: 512px;
+    height: 512px;
 }
 
 header h1 {
@@ -26,7 +56,7 @@ nav ul li {
 }
 
 nav ul li a {
-    color: #fff;
+    color: #FFFFFF;
     text-decoration: none;
 }
 
@@ -39,18 +69,7 @@ section {
 }
 
 h2 {
-    color: #333;
-}
-
-aside {
-    float: right;
-    width: 200px;
-    margin-left: 20px;
-}
-
-aside img {
-    width: 100%;
-    margin-bottom: 10px;
+    color: #333333;
 }
 
 .gallery {
@@ -66,7 +85,7 @@ aside img {
 
 footer {
     background-color: #333;
-    color: #fff;
+    color: #FFFFFF;
     padding: 10px;
     text-align: center;
 }
