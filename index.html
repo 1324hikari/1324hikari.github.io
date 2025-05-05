@@ -1,74 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta name="viewport" width="device-width" content="initial-scale=1.0">
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>1324Hikari</title>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1>1324Hikari</h1>
-        <nav>
-            <ul>
-                <li><a href="#about">About</a></li>
-				<li><a href="#posts">Posts</a></li>
-                <li><a href="#media">Media</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <section id="about">
-            <h2>Tungkol sa akin</h2>
-            <p>
-				Advocate for the Bisaya Lives Matter movement
-			</p>
-        </section>
-        <section id="image-section">
-            <div class="image-container">
-                <img src="img/image1.jpg" alt="Image 1">
-                <p>
-                    Isang random na Pinoy na walang magagawa sa buhay
-                    kundi mag edit ng video, picture, o-diba mag code ulol.
-                </p>
+    <nav class="navbar">
+        <img src="res/nav-logo.png" alt="13Hikari Logo" class="nav-logo">
+        <button class="menu-btn">
+            <span class="menu-icon"></span>
+        </button>
+    </nav>
+    <div class="container">
+        <section class="main">
+            <img src="res/logo.png" alt="13Hikari Logo Full" class="logo">
+            <h1 class="title">1324Hikari</h1>
+            <p class="subtitle">The next chapter in the Girls' Frontline saga. Command your T-Dolls in this strategic RPG sequel.</p>
+            <button class="download-btn">SELOS MODE ACTIVATE</button>
+            <div class="scroll-indicator">
+                <span class="chevron"></span>
             </div>
-            <div class="image-container">
-                <img src="img/image2.jpg" alt="Image 2"</p>
-                <p>
-                    Cellphone lang meron ni bro (donate kayo ng laptop pls)
-                </p>
+        </section>     
+        <section class="waifupic">
+            <h2 class="section-title">Waifu Pics</h2>
+            <div class="waifuwu-container">
+                <img src="res/wfp.jpg" alt="Rin 1" class="waifupic">
+                <img src="res/wfp2.jpg" alt="Rin 2" class="waifupic">
+                <img src="res/wfp3.jpg" alt="Rin 3" class="waifupic">
+                <img src="res/wfp4.jpg" alt="Rin 4" class="waifupic">
             </div>
-            <div class="image-container">
-                <img src="img/image3.jpg" alt="Image 3">
-                <p>
-                    Ang hate ko talaga sa coding ay yung part na we can't
-                    force someone to choose us:(
-                </p>
-            </div>
-        </section>
-        <section id="posts">
-            <h2>Posts</h2>
-            <p>
-                PINDUTIN <a href="suspicious.html">DITO</a> 
-		MAY SURPRESA!!
-            </p>
-        </section>
-        <section id="media">
-            <h2>Media</h2>
-            <div class="gallery">
-                <img src="img/media/media1.jpg" alt="Image 1">
-                <img src="img/media/media2.jpg" alt="Image 2">
-                <img src="img/media/media3.jpg" alt="Image 3">
+        </section>      
+        <section class="about">
+            <h2 class="section-title">ABOUT ME</h2>
+            <div class="about-grid">
+                <div class="about-card">
+                    <div class="about-icon g1"></div>
+                    <h3 class="about-title">Random Filipino Coder</h3>
+                    <p class="about-desc">Isang pinaka-random na coder na kahit ano nalang ang maisipan.</p>
+                </div>            
+                <div class="about-card">
+                    <div class="about-icon g2"></div>
+                    <h3 class="about-title">What I use for coding</h3>
+                    <p class="about-desc">Cellphone lang ang gamit ko sa pag-code. Termux with Debian using PRoot ang aking gamit.</p>
+                </div>               
+                <div class="about-card">
+                    <div class="about-icon g3"></div>
+                    <h3 class="about-title">Why cellphone for coding</h3>
+                    <p class="about-desc">Wala kasi akong laptop (donate kayo please hehe). Ang di ko talaga gusto sa coding ay yung part na we can't force someone to choose us:(</p>
+                </div>                
+                <div class="about-card">
+                    <div class="about-icon g4"></div>
+                    <h3 class="about-title">Moral Lesson</h3>
+                    <p class="about-desc">Sana ako nalang at hindi siya:(</p>
+                </div>
             </div>
         </section>
-        <section id="contact">
-            <h2>Sana ako nalang kase:( HAHA</h2>
-        </section>
-    </main>
-    <footer>
-        <p>Walang magawa sa buhay kaya ginawa tong website na 'to</p>
-    </footer>
+        <footer>
+            <div class="social-links">
+<!--                <a href="#" class="social-icon facebook"></a>
+                <a href="#" class="social-icon twitter"></a>
+                <a href="#" class="social-icon telegram"></a> -->
+                <a href="https://discord.gg/H5t9fu6TkF" class="social-icon discord"></a>
+            </div>
+            <p>© 2025 1324hikari. All Rights Reserved.</p>
+        </footer>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
