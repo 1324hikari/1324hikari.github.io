@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Post Detail</title>
+    <link rel="stylesheet" href="res/style.css" />
+    <style>
+        .post-detail-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+            padding: 30px 40px;
+        }
+
+        .post-detail-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #222;
+        }
+
+        .post-detail-content {
+            font-size: 1.15rem;
+            line-height: 1.6;
+            color: #444;
+            white-space: pre-wrap;
+            margin-bottom: 25px;
+        }
+
+        .post-detail-date {
+            font-size: 0.9rem;
+            color: #777;
+            font-style: italic;
+            text-align: right;
+        }
+
+        @media (max-width: 600px) {
+            .post-detail-container {
+                padding: 20px 25px;
+            }
+
+            .post-detail-title {
+                font-size: 1.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <img src="res/nav-logo.png" alt="13Hikari Logo" class="nav-logo" />
+    <button class="menu-btn" aria-label="Toggle menu">
+        <span class="menu-icon"></span>
+    </button>
+    <div class="menu-overlay">
+        <ul class="menu-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="posts.html" class="active">Posts</a></li>
+            <li><a href="dashboard.html">Admin</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="post-detail-container" id="postDetail">
+    <p>Loading post...</p>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+        getFirestore,
+        doc,
+        getDoc
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC-iYL6szyRSf5Jegqoiza2yq7FGtGgTDg",
+        authDomain: "hikari-blog.firebaseapp.com",
+        projectId: "hikari-blog",
+        storageBucket: "hikari-blog.firebasestorage.app",
+        messagingSenderId: "349415153573",
+        appId: "1:349415153573:web:240f1b85ae312931c3524c",
+        measurementId: "G-T2VQPL77WX",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const postDetail = document.getElementById("postDetail");
+
+    // Helper to get query params
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    async function loadPost() {
+        const postId = getQueryParam("id");
+
+        if (!postId) {
+            postDetail.innerHTML = "<p>Invalid post ID.</p>";
+            return;
+        }
+
+        const postRef = doc(db, "posts", postId);
+        const postSnap = await getDoc(postRef);
+
+        if (!postSnap.exists()) {
+            postDetail.innerHTML = "<p>Post not found.</p>";
+            return;
+        }
+
+        const post = postSnap.data();
+        const date = post.date?.toDate ? post.date.toDate() : new Date();
+
+        postDetail.innerHTML = `
+            <h1 class="post-detail-title">${post.title}</h1>
+            <div class="post-detail-content">${post.content.replace(/\n/g, "<br>")}</div>
+            <div class="post-detail-date">${date.toLocaleString()}</div>
+        `;
+    }
+
+    loadPost();
+</script>
+
+<script src="res/script.js"></script>
+</body>
+</html>
+

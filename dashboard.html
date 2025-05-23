@@ -3,8 +3,113 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Dashboard - Admin Portal</title>
+    <title>Admin Portal</title>
     <link rel="stylesheet" href="res/style.css" />
+    <style>
+        /* Manage Posts Section */
+        #postsList {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Each post card */
+        .post-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+            padding: 20px 25px;
+            display: flex;
+            flex-direction: column;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .post-card:hover {
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        /* Post title */
+        .post-card h3 {
+            margin: 0 0 12px 0;
+            font-size: 1.4rem;
+            color: #222;
+            font-weight: 700;
+        }
+
+        /* Post content preview */
+        .post-card p {
+            font-size: 1rem;
+            color: #444;
+            margin: 0 0 16px 0;
+            white-space: pre-wrap;
+            max-height: 90px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Date at the bottom in italic */
+        .post-card .post-date {
+            font-size: 0.85rem;
+            color: #777;
+            font-style: italic;
+            margin-bottom: 12px;
+        }
+
+        /* Buttons container */
+        .post-card .btn-group {
+            margin-top: auto;
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Buttons */
+        .post-card button {
+            flex: 1;
+            padding: 10px 15px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .post-card button.edit-btn {
+            background-color: #4caf50;
+            color: #fff;
+        }
+
+        .post-card button.edit-btn:hover {
+            background-color: #43a047;
+        }
+
+        .post-card button.delete-btn {
+            background-color: #e53935;
+            color: #fff;
+        }
+
+        .post-card button.delete-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .post-card {
+                padding: 16px 20px;
+            }
+
+            .post-card h3 {
+                font-size: 1.2rem;
+            }
+
+            .post-card p {
+                max-height: 70px;
+            }
+        }
+    </style>
 </head>
 <body>
 <nav class="navbar">
@@ -21,27 +126,33 @@
     </div>
 </nav>
 
-<div class="container" id="mainContent" style="display:none;">
+<div class="container">
     <section class="main">
-        <h1 class="title">Dashboard</h1>
-        <p class="subtitle">Manage your posts here</p>
+        <h1 class="title">Admin Portal</h1>
+        <p class="subtitle">Only authorized users can post new content</p>
 
-        <div id="postFormSection">
-            <h2>Add / Edit Post</h2>
-            <form class="login-form" id="postForm">
-                <input type="hidden" id="postId" />
-                <input type="text" id="title" class="styled-input"  placeholder="Post Title" /><br /><br />
-                <textarea id="content" placeholder="Post Content"></textarea><br /><br />
-                <button class="login-btn" id="savePostBtn">Save Post</button>
-                <button class="login-btn" id="cancelEditBtn" type="button" style="display:none; margin-left:10px;">Cancel</button>
+        <div class="login-container" id="loginSection">
+            <form class="login-form">
+                <input type="email" id="email" placeholder="Email" /><br /><br />
+                <input type="password" id="password" placeholder="Password" /><br /><br />
+                <button class="login-btn" id="loginButton">Log In</button>
             </form>
         </div>
 
-        <hr />
+        <div id="adminPanel" style="display:none; margin-top: 30px;">
+            <h2>New Post</h2>
+            <form class="login-form" id="postForm">
+                <input type="text" id="title" placeholder="Post Title" /><br /><br />
+                <textarea id="content" placeholder="Post Content"></textarea><br /><br />
+                <button class="login-btn" id="publishBtn">Publish</button>
+                <button class="login-btn" id="updateBtn" style="display:none; margin-left:10px; background-color:#1976d2;">Update</button>
+                <button class="login-btn" id="cancelEditBtn" style="display:none; margin-left:10px; background-color:#757575;">Cancel</button>
+            </form>
 
-        <div id="postsList">
-            <h2>Existing Posts</h2>
-            <ul id="postsUl" style="list-style:none; padding-left:0;"></ul>
+            <h2 style="margin-top: 50px;">Manage Posts</h2>
+            <div id="postsList">
+                <!-- Posts will be loaded here -->
+            </div>
         </div>
     </section>
 
@@ -50,15 +161,11 @@
     </footer>
 </div>
 
-<div id="forbiddenMessage" style="display:none; text-align:center; margin-top:50px;">
-    <h1>403 Forbidden</h1>
-    <p>You do not have permission to access this page.</p>
-</div>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
     import {
         getAuth,
+        signInWithEmailAndPassword,
         signOut,
         onAuthStateChanged,
         getIdTokenResult
@@ -66,12 +173,12 @@
     import {
         getFirestore,
         collection,
-        getDocs,
         addDoc,
+        serverTimestamp,
+        onSnapshot,
+        doc,
         updateDoc,
         deleteDoc,
-        doc,
-        serverTimestamp,
         query,
         orderBy
     } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
@@ -90,119 +197,71 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const mainContent = document.getElementById("mainContent");
-    const forbiddenMessage = document.getElementById("forbiddenMessage");
+    const loginSection = document.getElementById("loginSection");
+    const adminPanel = document.getElementById("adminPanel");
+    const loginButton = document.getElementById("loginButton");
     const logoutLink = document.getElementById("logoutLink");
-
-    const postsUl = document.getElementById("postsUl");
-    const postForm = document.getElementById("postForm");
-    const postIdInput = document.getElementById("postId");
-    const titleInput = document.getElementById("title");
-    const contentInput = document.getElementById("content");
-    const savePostBtn = document.getElementById("savePostBtn");
+    const publishBtn = document.getElementById("publishBtn");
+    const updateBtn = document.getElementById("updateBtn");
     const cancelEditBtn = document.getElementById("cancelEditBtn");
 
-    // Check admin and show/hide content accordingly
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            const idTokenResult = await getIdTokenResult(user);
-            if (idTokenResult.claims.admin) {
-                mainContent.style.display = "block";
-                forbiddenMessage.style.display = "none";
-                logoutLink.style.display = "inline-block";
-                loadPosts();
-            } else {
-                mainContent.style.display = "none";
-                forbiddenMessage.style.display = "block";
-                logoutLink.style.display = "none";
-                await signOut(auth);
-            }
-        } else {
-            // Not logged in, redirect to login page
-            window.location.href = "login.html";
+    const titleInput = document.getElementById("title");
+    const contentInput = document.getElementById("content");
+    const postsList = document.getElementById("postsList");
+
+    let editPostId = null;
+
+    // Login functionality
+    loginButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+
+        if (!email || !password) {
+            alert("Please enter both email and password.");
+            return;
         }
+
+        loginButton.textContent = "Logging in...";
+        loginButton.disabled = true;
+
+        signInWithEmailAndPassword(auth, email, password)
+            .then(async (userCredential) => {
+                const user = userCredential.user;
+                const idTokenResult = await getIdTokenResult(user);
+                if (idTokenResult.claims.admin) {
+                    alert("Log-in Success");
+                    loginSection.style.display = "none";
+                    adminPanel.style.display = "block";
+                    logoutLink.style.display = "inline";
+                    loadPosts();
+                } else {
+                    alert("Access denied: not an admin");
+                    await signOut(auth);
+                }
+            })
+            .catch(() => {
+                alert("Incorrect Password or E-Mail");
+            })
+            .finally(() => {
+                loginButton.textContent = "Log In";
+                loginButton.disabled = false;
+            });
     });
 
     logoutLink.addEventListener("click", async (e) => {
         e.preventDefault();
         await signOut(auth);
-        window.location.href = "login.html";
+        loginSection.style.display = "block";
+        adminPanel.style.display = "none";
+        logoutLink.style.display = "none";
+        alert("Logged out successfully");
+        clearForm();
+        clearPostsList();
     });
 
-    // Load posts from Firestore and display
-    async function loadPosts() {
-        postsUl.innerHTML = "Loading posts...";
-        try {
-            const q = query(collection(db, "posts"), orderBy("date", "desc"));
-            const querySnapshot = await getDocs(q);
-            postsUl.innerHTML = "";
-            querySnapshot.forEach((docSnap) => {
-                const post = docSnap.data();
-                const li = document.createElement("li");
-                li.style.border = "1px solid #ccc";
-                li.style.padding = "10px";
-                li.style.marginBottom = "10px";
-                li.dataset.id = docSnap.id;
-
-                const titleElem = document.createElement("h3");
-                titleElem.textContent = post.title;
-
-                const contentElem = document.createElement("p");
-                contentElem.textContent = post.content;
-
-                const editBtn = document.createElement("button");
-                editBtn.textContent = "Edit";
-                editBtn.className = "login-btn";
-                editBtn.style.marginRight = "10px";
-                editBtn.addEventListener("click", () => editPost(docSnap.id, post));
-
-                const deleteBtn = document.createElement("button");
-                deleteBtn.textContent = "Delete";
-                deleteBtn.className = "login-btn";
-                deleteBtn.style.backgroundColor = "#d9534f";
-                deleteBtn.addEventListener("click", () => deletePost(docSnap.id));
-
-                li.appendChild(titleElem);
-                li.appendChild(contentElem);
-                li.appendChild(editBtn);
-                li.appendChild(deleteBtn);
-
-                postsUl.appendChild(li);
-            });
-
-            if (postsUl.innerHTML.trim() === "") {
-                postsUl.innerHTML = "<p>No posts found.</p>";
-            }
-        } catch (err) {
-            postsUl.innerHTML = "<p>Error loading posts: " + err.message + "</p>";
-        }
-    }
-
-    // Edit post: fill form with data
-    function editPost(id, post) {
-        postIdInput.value = id;
-        titleInput.value = post.title;
-        contentInput.value = post.content;
-        savePostBtn.textContent = "Update Post";
-        cancelEditBtn.style.display = "inline-block";
-    }
-
-    // Cancel editing
-    cancelEditBtn.addEventListener("click", () => {
-        resetForm();
-    });
-
-    // Reset form
-    function resetForm() {
-        postIdInput.value = "";
-        titleInput.value = "";
-        contentInput.value = "";
-        savePostBtn.textContent = "Save Post";
-        cancelEditBtn.style.display = "none";
-    }
-
-    // Handle form submit to add or update post
-    postForm.addEventListener("submit", async (e) => {
+    // Publish new post
+    publishBtn.addEventListener("click", async (e) => {
         e.preventDefault();
         const title = titleInput.value.trim();
         const content = contentInput.value.trim();
@@ -212,46 +271,166 @@
             return;
         }
 
-        const postId = postIdInput.value;
-
         try {
-            if (postId) {
-                // Update existing post
-                const postRef = doc(db, "posts", postId);
-                await updateDoc(postRef, {
-                    title,
-                    content,
-                    date: serverTimestamp(),
-                });
-                alert("Post updated successfully!");
-            } else {
-                // Add new post
-                await addDoc(collection(db, "posts"), {
-                    title,
-                    content,
-                    date: serverTimestamp(),
-                });
-                alert("Post added successfully!");
-            }
-            resetForm();
-            loadPosts();
+            await addDoc(collection(db, "posts"), {
+                title,
+                content,
+                date: serverTimestamp(),
+            });
+            alert("Post published successfully!");
+            clearForm();
         } catch (err) {
-            alert("Error saving post: " + err.message);
+            alert("Error publishing post: " + err.message);
         }
     });
 
-    // Delete post by id
-    async function deletePost(id) {
-        if (confirm("Are you sure you want to delete this post?")) {
-            try {
-                await deleteDoc(doc(db, "posts", id));
-                alert("Post deleted successfully!");
-                loadPosts();
-            } catch (err) {
-                alert("Error deleting post: " + err.message);
+    // Update existing post
+    updateBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        if (!editPostId) return;
+
+        const title = titleInput.value.trim();
+        const content = contentInput.value.trim();
+
+        if (!title || !content) {
+            alert("Please fill out both title and content.");
+            return;
+        }
+
+        try {
+            const postRef = doc(db, "posts", editPostId);
+            await updateDoc(postRef, {
+                title,
+                content,
+            });
+            alert("Post updated successfully!");
+            clearForm();
+        } catch (err) {
+            alert("Error updating post: " + err.message);
+        }
+    });
+
+    // Cancel editing
+    cancelEditBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        clearForm();
+    });
+
+    // Load and listen to posts realtime
+    function loadPosts() {
+        clearPostsList();
+
+        const postsQuery = query(collection(db, "posts"), orderBy("date", "desc"));
+        onSnapshot(postsQuery, (snapshot) => {
+            clearPostsList();
+
+            snapshot.forEach(docSnap => {
+                const post = docSnap.data();
+                const postId = docSnap.id;
+                const date = post.date?.toDate ? post.date.toDate() : new Date();
+
+                const postCard = document.createElement("div");
+                postCard.className = "post-card";
+
+                const titleEl = document.createElement("h3");
+                titleEl.textContent = post.title;
+                postCard.appendChild(titleEl);
+
+                const contentEl = document.createElement("p");
+                contentEl.textContent = post.content;
+                postCard.appendChild(contentEl);
+
+                const dateEl = document.createElement("div");
+                dateEl.className = "post-date";
+                dateEl.textContent = date.toLocaleString();
+                postCard.appendChild(dateEl);
+
+                const btnGroup = document.createElement("div");
+                btnGroup.className = "btn-group";
+
+                const editBtn = document.createElement("button");
+                editBtn.className = "edit-btn";
+                editBtn.textContent = "Edit";
+                editBtn.onclick = () => startEditPost(postId, post);
+                btnGroup.appendChild(editBtn);
+
+                const deleteBtn = document.createElement("button");
+                deleteBtn.className = "delete-btn";
+                deleteBtn.textContent = "Delete";
+                deleteBtn.onclick = () => deletePost(postId);
+                btnGroup.appendChild(deleteBtn);
+
+                postCard.appendChild(btnGroup);
+
+                postsList.appendChild(postCard);
+            });
+
+            if (postsList.childElementCount === 0) {
+                postsList.innerHTML = "<p>No posts found.</p>";
             }
+        });
+    }
+
+    // Start editing a post
+    function startEditPost(id, post) {
+        editPostId = id;
+        titleInput.value = post.title;
+        contentInput.value = post.content;
+
+        publishBtn.style.display = "none";
+        updateBtn.style.display = "inline-block";
+        cancelEditBtn.style.display = "inline-block";
+    }
+
+    // Delete a post
+    async function deletePost(id) {
+        if (!confirm("Are you sure you want to delete this post?")) return;
+
+        try {
+            await deleteDoc(doc(db, "posts", id));
+            alert("Post deleted successfully");
+            if (editPostId === id) clearForm();
+        } catch (err) {
+            alert("Error deleting post: " + err.message);
         }
     }
+
+    // Clear form and reset buttons
+    function clearForm() {
+        editPostId = null;
+        titleInput.value = "";
+        contentInput.value = "";
+        publishBtn.style.display = "inline-block";
+        updateBtn.style.display = "none";
+        cancelEditBtn.style.display = "none";
+    }
+
+    // Clear posts list container
+    function clearPostsList() {
+        postsList.innerHTML = "";
+    }
+
+    // Check auth state
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const idTokenResult = await getIdTokenResult(user);
+            if (idTokenResult.claims.admin) {
+                loginSection.style.display = "none";
+                adminPanel.style.display = "block";
+                logoutLink.style.display = "inline";
+                loadPosts();
+            } else {
+                await signOut(auth);
+                loginSection.style.display = "block";
+                adminPanel.style.display = "none";
+                logoutLink.style.display = "none";
+            }
+        } else {
+            loginSection.style.display = "block";
+            adminPanel.style.display = "none";
+            logoutLink.style.display = "none";
+        }
+    });
 </script>
 
 <script src="res/script.js"></script>
