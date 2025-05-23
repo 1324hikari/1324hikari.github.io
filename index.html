@@ -10,12 +10,20 @@
 <body>
     <nav class="navbar">
         <img src="res/nav-logo.png" alt="13Hikari Logo" class="nav-logo">
-        <button class="menu-btn">
+        <button class="menu-btn" aria-label="Toggle menu">
             <span class="menu-icon"></span>
         </button>
+        <div class="menu-overlay">
+            <ul class="menu-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#waifupic">Waifu Pics</a></li>
+                <li><a href="#about">About Me</a></li>
+            </ul>
+        </div>
     </nav>
+    
     <div class="container">
-        <section class="main">
+        <section id="home" class="main">
             <img src="res/logo.png" alt="13Hikari Logo Full" class="logo">
             <h1 class="title">1324Hikari</h1>
             <p class="subtitle">Bot Developer and a dude who loves Anime and Gacha games</p>
@@ -25,34 +33,36 @@
             <div class="scroll-indicator">
                 <span class="chevron"></span>
             </div>
-        </section>     
-        <section class="waifupic">
+        </section>
+        
+        <section id="waifupic" class="waifupic">
             <h2 class="section-title">Waifu Pics</h2>
             <div class="waifuwu-container">
-                <img src="res/wfp.jpg" alt="Rin 1" class="waifupic">
-                <img src="res/wfp2.jpg" alt="Rin 2" class="waifupic">
-                <img src="res/wfp3.jpg" alt="Rin 3" class="waifupic">
-                <img src="res/wfp4.jpg" alt="Rin 4" class="waifupic">
+                <img src="res/wfp.jpg" alt="Rin 1" class="waifu-img">
+                <img src="res/wfp2.jpg" alt="Rin 2" class="waifu-img">
+                <img src="res/wfp3.jpg" alt="Rin 3" class="waifu-img">
+                <img src="res/wfp4.jpg" alt="Rin 4" class="waifu-img">
             </div>
-        </section>      
-        <section class="about" id="about">
+        </section>
+        
+        <section id="about" class="about">
             <h2 class="section-title">ABOUT ME</h2>
             <div class="about-grid">
                 <div class="about-card">
                     <div class="about-icon g1"></div>
                     <h3 class="about-title">Random Filipino Coder</h3>
                     <p class="about-desc">Isang pinaka-random na coder na kahit ano nalang ang maisipan.</p>
-                </div>            
+                </div>
                 <div class="about-card">
                     <div class="about-icon g2"></div>
                     <h3 class="about-title">What I use for coding</h3>
                     <p class="about-desc">Cellphone lang ang gamit ko sa pag-code. Termux with Debian using PRoot ang aking gamit.</p>
-                </div>               
+                </div>
                 <div class="about-card">
                     <div class="about-icon g3"></div>
                     <h3 class="about-title">Why cellphone for coding</h3>
                     <p class="about-desc">Wala kasi akong laptop (donate kayo please hehe). Ang di ko talaga gusto sa coding ay yung part na we can't force someone to choose us:(</p>
-                </div>                
+                </div>
                 <div class="about-card">
                     <div class="about-icon g4"></div>
                     <h3 class="about-title">Moral Lesson</h3>
@@ -64,16 +74,12 @@
                 </div>
             </div>
         </section>
+        
         <footer>
-           <!-- <div class="social-links">
-                <a href="#" class="social-icon facebook"></a>
-                <a href="#" class="social-icon twitter"></a>
-                <a href="#" class="social-icon telegram"></a>
-                <a href="https://discord.gg/H5t9fu6TkF" class="social-icon discord"></a>
-            </div>-->
             <p>© 2025 1324hikari. All Rights Reserved.</p>
         </footer>
     </div>
+    
     <script src="script.js"></script>
 </body>
 </html>
