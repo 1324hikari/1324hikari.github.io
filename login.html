@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Portal</title>
+    <link rel="stylesheet" href="res/style.css" />
+</head>
+<body>
+<nav class="navbar">
+    <img src="res/nav-logo.png" alt="13Hikari Logo" class="nav-logo" />
+    <button class="menu-btn" aria-label="Toggle menu">
+        <span class="menu-icon"></span>
+    </button>
+    <div class="menu-overlay">
+        <ul class="menu-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="posts.html">Posts</a></li>
+            <li><a href="#" id="logoutLink" style="display:none;">Logout</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <section class="main">
+        <h1 class="title">Admin Portal</h1>
+        <p class="subtitle">Only authorized users can post new content</p>
+
+        <div class="login-container" id="loginSection">
+            <form class="login-form">
+                <input type="email" id="email" placeholder="Email" /><br /><br />
+                <input type="password" id="password" placeholder="Password" /><br /><br />
+                <button class="login-btn" id="loginButton">Log In</button>
+            </form>
+        </div>
+
+        <div id="adminPanel" style="display:none; margin-top: 30px;">
+            <h2>New Post</h2>
+            <form class="login-form">
+                <input type="text" id="title" placeholder="Post Title" /><br /><br />
+                <textarea id="content" placeholder="Post Content"></textarea><br /><br />
+                <button class="login-btn" id="publishBtn">Publish</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2025 1324hikari. All Rights Reserved.</p>
+    </footer>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+        getAuth,
+        signInWithEmailAndPassword,
+        signOut,
+        onAuthStateChanged,
+        getIdTokenResult
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+    import {
+        getFirestore,
+        collection,
+        addDoc,
+        serverTimestamp,
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC-iYL6szyRSf5Jegqoiza2yq7FGtGgTDg",
+        authDomain: "hikari-blog.firebaseapp.com",
+        projectId: "hikari-blog",
+        storageBucket: "hikari-blog.firebasestorage.app",
+        messagingSenderId: "349415153573",
+        appId: "1:349415153573:web:240f1b85ae312931c3524c",
+        measurementId: "G-T2VQPL77WX",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const loginSection = document.getElementById("loginSection");
+    const adminPanel = document.getElementById("adminPanel");
+    const loginButton = document.getElementById("loginButton");
+    const logoutLink = document.getElementById("logoutLink");
+    const publishBtn = document.getElementById("publishBtn");
+
+    loginButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+
+        if (!email || !password) {
+            alert("Please enter both email and password.");
+            return;
+        }
+
+        loginButton.textContent = "Logging in...";
+        loginButton.disabled = true;
+
+        signInWithEmailAndPassword(auth, email, password)
+            .then(async (userCredential) => {
+                const user = userCredential.user;
+                const idTokenResult = await getIdTokenResult(user);
+                if (idTokenResult.claims.admin) {
+                    alert("Log-in Success");
+                    // Redirect to dashboard.html after login
+                    window.location.href = "dashboard.html";
+                } else {
+                    alert("Access denied: not an admin");
+                    await signOut(auth);
+                }
+            })
+            .catch(() => {
+                alert("Incorrect Password or E-Mail");
+            })
+            .finally(() => {
+                loginButton.textContent = "Log In";
+                loginButton.disabled = false;
+            });
+    });
+
+    logoutLink.addEventListener("click", async (e) => {
+        e.preventDefault();
+        await signOut(auth);
+        loginSection.style.display = "block";
+        adminPanel.style.display = "none";
+        logoutLink.style.display = "none";
+        alert("Logged out successfully");
+    });
+
+    publishBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        const title = document.getElementById("title").value.trim();
+        const content = document.getElementById("content").value.trim();
+
+        if (!title || !content) {
+            alert("Please fill out both title and content.");
+            return;
+        }
+
+        try {
+            await addDoc(collection(db, "posts"), {
+                title,
+                content,
+                date: serverTimestamp(),
+            });
+            alert("Post published successfully!");
+            document.getElementById("title").value = "";
+            document.getElementById("content").value = "";
+        } catch (err) {
+            alert("Error publishing post: " + err.message);
+        }
+    });
+
+    // Redirect admin to dashboard if already logged in
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const idTokenResult = await getIdTokenResult(user);
+            if (idTokenResult.claims.admin) {
+                window.location.href = "dashboard.html";
+            } else {
+                await signOut(auth);
+                loginSection.style.display = "block";
+                adminPanel.style.display = "none";
+                logoutLink.style.display = "none";
+            }
+        } else {
+            loginSection.style.display = "block";
+            adminPanel.style.display = "none";
+            logoutLink.style.display = "none";
+        }
+    });
+</script>
+
+<script src="res/script.js"></script>
+</body>
+</html>
+
